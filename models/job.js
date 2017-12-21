@@ -11,3 +11,6 @@ const jobSchema = new Schema({
         required : [ true, 'Job Description Cannot be empty']
     }
 })
+
+const Job = mongoose.model('Job', jobSchema)
+module.exports = Job
