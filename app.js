@@ -8,6 +8,9 @@ const expressValidator = require('express-validator')
 const methodOverride = require('method-override')
 const mongoose = require('mongoose')
 const path = require('path')
+const server = require('http').createServer(app)
+//sockets runs on server not express
+const io = require('socket.io')(server)
 const flash = require('connect-flash')
 const passport = require('passport')
 const port = process.env.PORT || 3000;
@@ -73,7 +76,61 @@ app.set('view engine', 'handlebars')
 
 app.use('/', routes)
 
+// Chat room
+let users = []
+var numUsers = 0;
 
-app.listen(port, () => {
-  console.log('---Express Connected---')
+io.on('connection', function(socket){
+  console.log('a user connected')
+
+  // Set Username
+  socket.on('set user', (data, callback) => {
+    if(users.indexOf(data) != -1){
+      callback(false);
+    }
+    else{
+      callback(true);
+      socket.username = data;
+      users.push(socket.username);
+      updateUsers();
+      // Sends to everyone including self
+      // io.socket.emit('userannounce', {user: socket.username})
+    }
+    // Broadcast to everyone but self
+    socket.broadcast.emit('userannounce', {user: socket.username})
+
+
+  // Username
+    socket.on('showuser', function(data){
+      io.sockets.emit('showusertyping', {user: socket.username})
+      // console.log(socket.username)
+    })
+
+
+    // Has to be inside the set user to prevent undefined user from posting  messages
+    socket.on('send message', function(data){
+      io.sockets.emit('show message', {msg: data, user: socket.username});
+     // console.log('message: ' + msg);
+   });
+
+
+  })
+
+  socket.on('disconnect', function(data){
+    // console.log('user disconnected');
+    if(!socket.username) return;
+    users.splice(users.indexOf(socket.username), 1);
+    updateUsers();
+  });
+
+  function updateUsers(){
+    io.sockets.emit('users', users)
+  }
+
+
+
+})
+
+server.listen(port, () => {
+  console.log('---Express IO Connected---')
 })

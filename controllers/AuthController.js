@@ -32,10 +32,11 @@ exports.signup = (req, res) =>{
 
 
   let errors = req.validationErrors()
-  console.log(errors);
+  // console.log(errors);
   if(errors){
     res.render('auth/register', { errors : errors})
-  }else{
+  }
+  else{
 
     User.create({
         firstname : req.body.firstname,

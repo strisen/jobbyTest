@@ -9,6 +9,13 @@ const jobSchema = new Schema({
     description :{
         type : String,
         required : [ true, 'Job Description Cannot be empty']
+    },
+    created_at :{
+      type: Date,
+      default : Date.now
+    },
+    created_by :{
+      type : Schema.Types.ObjectId
     }
 })
 
