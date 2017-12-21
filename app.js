@@ -94,10 +94,10 @@ io.on('connection', function(socket){
       users.push(socket.username);
       updateUsers();
       // Sends to everyone including self
-      // io.socket.emit('userannounce', {user: socket.username})
+      io.sockets.emit('userannounce', {user: socket.username})
     }
     // Broadcast to everyone but self
-    socket.broadcast.emit('userannounce', {user: socket.username})
+    // socket.broadcast.emit('userannounce', {user: socket.username})
 
 
   // Username
@@ -109,7 +109,10 @@ io.on('connection', function(socket){
 
     // Has to be inside the set user to prevent undefined user from posting  messages
     socket.on('send message', function(data){
+      if(data != ""){
+        // console.log(typeof(data))
       io.sockets.emit('show message', {msg: data, user: socket.username});
+    }
      // console.log('message: ' + msg);
    });
 

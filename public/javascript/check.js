@@ -8,6 +8,9 @@ $(document).ready(function(){
   let username = $('#username')
   let users = $('#users')
   let error = $('#error')
+  let i = 0;
+  let cw;
+  let chatUi = $('#chatUI')
 
   // Submit User Form
   userForm.on('submit', function(e){
@@ -31,12 +34,32 @@ $(document).ready(function(){
 
   // Show new user
   socket.on('userannounce', function(data){
-    chatWindow.append('<strong>'+data.user+' has joined the channel.</strong><br>')
+    chatWindow.append('<div id="'+i+'"><strong>'+data.user+' has joined the channel.</strong></div>')
+
+    i++;
+
+    // chatWindow.append('<strong>'+data.user+' has joined the channel.</strong><br>')
   })
 
   // Show message
   socket.on('show message', function(data){
-    chatWindow.append('<strong>'+data.user+'</strong>: '+data.msg+'<br>');
+
+    chatWindow.append('<div id="'+ i +'"><strong>'+data.user+'</strong>: '+data.msg+'</div>');
+
+    //
+    // if(i > 6){
+    //   $('#' + (i-7)).remove();
+    // }
+
+    // chatWindow.append('<strong>'+data.user+'</strong>:'+data.msg+'</div><br>')
+
+    cw = document.getElementById(i)
+    console.log(cw)
+    cw.scrollIntoView(false);
+
+    i++;
+
+
   });
 
   // Display Usernames
@@ -63,10 +86,10 @@ $(document).ready(function(){
       // }, 1000)
 
       $('#test').remove()
-      chatWindow.append("<div id='test' style='position: absolute; padding-bottom:5px;'><strong>" + data.user + " is typing...</strong></div>")
+      chatUi.append("<div id='test' style='position: absolute; '><strong>" + data.user + " is typing...</strong></div>")
       setTimeout(function(){
         $('#test').remove()
-      }, 1000)
+      }, 500)
   })
 
 
