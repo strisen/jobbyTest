@@ -244,7 +244,7 @@ else {
 }
 })
 
-var stream = tweet.stream('statuses/filter', { track: ['gg delays']})
+var stream = tweet.stream('statuses/filter', { track: ['smrt train delay OR fault OR disruption, -press']})
 
 stream.on('tweet', function(tweet){
   console.log(tweet)
