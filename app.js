@@ -244,7 +244,7 @@ else {
 }
 })
 
-var stream = tweet.stream('statuses/filter', { track: ['smrt train delay OR fault OR disruption, -press']})
+var stream = tweet.stream('statuses/filter', { track: 'smrt delays,smrt train delay,singapore train delay,smrt train fault,smrt train disruption,smrt disruption,smrt track fault,smrt fault'})
 
 stream.on('tweet', function(tweet){
   console.log(tweet)
