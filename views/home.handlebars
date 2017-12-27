@@ -1,4 +1,13 @@
 Default Home Index
+<div class="well tweettest" style="overflow: auto; height: 300px; width: 500px;" >
+  {{#each tweets}}
+    <ul>
+    <li>{{tweetUser}}<br>{{tweetContent}}<br>{{tweetDate}}</li>
+    </ul>
+  {{/each}}
+
+</div>
+
 <div>
 
   <a class="twitter-timeline"  href="https://twitter.com/search?q=train%20delays%20singapore" data-widget-id="945536399695949824" data-theme="dark" data-show-replies="true" data-chrome="nofooter, noheader" data-height="300">Tweets about train delays singapore</a>

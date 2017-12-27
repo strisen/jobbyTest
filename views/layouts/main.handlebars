@@ -73,6 +73,18 @@
 {{/if}}
 {{{ body }}}
 </body>
+<script>
+Handlebars.registerHelper('sort',
+  function(date, options){
+    console.log(date)
+    var ret = "";
+    Object.keys(date).sort().forEach(function(tweetDate){
+      ret = ret + options.fn({tweetDate: tweetDate, value: date[tweetDate]})
+    })
+    return ret
+  })
+
+</script>
 <!-- jQuery library -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 

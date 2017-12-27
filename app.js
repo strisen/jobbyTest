@@ -17,6 +17,8 @@ const port = process.env.PORT || 3000;
 
 const routes = require('./routes/routes')
 const dbConfig = require('./config/dbConfig')
+const Twit = require('twit')
+const util = require('util')
 // console.log(dbConfig)
 
 mongoose.Promise = global.Promise
@@ -132,6 +134,132 @@ io.on('connection', function(socket){
 
 
 
+})
+
+// Twitter
+
+const tweet = require('./helpers/twitter')
+const Tweet = require('./models/tweet')
+
+function calculateSince(datetime)
+{
+  var tTime=new Date(datetime);
+  var cTime=new Date();
+  var sinceMin=Math.round((cTime-tTime)/60000);
+  if(sinceMin==0)
+  {
+      var sinceSec=Math.round((cTime-tTime)/1000);
+      if(sinceSec<10)
+        var since='less than 10 seconds ago';
+      else if(sinceSec<20)
+        var since='less than 20 seconds ago';
+      else
+        var since='half a minute ago';
+  }
+  else if(sinceMin==1)
+  {
+      var sinceSec=Math.round((cTime-tTime)/1000);
+      if(sinceSec==30)
+        var since='half a minute ago';
+      else if(sinceSec<60)
+        var since='less than a minute ago';
+      else
+        var since='1 minute ago';
+  }
+  else if(sinceMin<45)
+      var since=sinceMin+' minutes ago';
+  else if(sinceMin>44&&sinceMin<60)
+      var since='about 1 hour ago';
+  else if(sinceMin<1440){
+      var sinceHr=Math.round(sinceMin/60);
+  if(sinceHr==1)
+    var since='about 1 hour ago';
+  else
+    var since='about '+sinceHr+' hours ago';
+  }
+  else if(sinceMin>1439&&sinceMin<2880)
+      var since='1 day ago';
+  else
+  {
+      var sinceDay=Math.round(sinceMin/1440);
+      var since=sinceDay+' days ago';
+  }
+  return since;
+};
+
+// console.log(Tweet.length)
+
+tweet.get('search/tweets', {q: 'smrt train delay OR fault OR disruption, -press', count: 10, tweet_mode:'extended', result_type:'recent'}, function(err, data, res){
+  // console.log(data)
+  // console.log(util.inspect(data.statuses, false, null))
+  // console.log(data.statuses)
+  // let tweetData = JSON.stringify(data.statuses)
+  // util.inspect(data.statuses, false, null)
+  // console.log(tweetData.full_text)
+  Tweet.collection.remove({}, (err)=>{
+    if(err)return err
+
+    console.log('emptied')
+  })
+  for(let i=0; i<data.statuses.length; i++){
+  // let tweets = data.statuses[i]
+  // console.dir(tweets.retweeted_status.full_text)
+  if(data.statuses[i].retweeted_status){
+  // Tweet.create({
+  //   tweetContent: "RETWEET: " + data.statuses[i].retweeted_status.full_text,
+  //   tweetDate: data.statuses[i].created_at
+  // }, (err, createdTweet)=>{
+  //   if(err){return err}
+  //   else{
+  //     console.log('success Retweet')
+  //   }
+  // })
+  // return;
+}
+else {
+  let newTime = data.statuses[i].created_at;
+  // let reDate = newDate.split(" ");
+
+  console.log(calculateSince(newTime))
+  // console.log(reDate[2]+" "+reDate[1]+" "+reDate[5]+" "+reDate[3])
+  // let xeDate = new Date
+  // console.log(reDate[2]+"-"+reDate[1]+"-"+reDate[5]+" "+reDate[3]+" "+"UTC")
+  // console.log(xeDate)
+  // let date = [];
+  // date.push(data.statuses)
+  // console.dir(data.statuses[i].created_at)
+  setTimeout(()=>{
+  Tweet.create({
+    tweetUser: "@"+data.statuses[i].user.screen_name,
+    tweetContent: data.statuses[i].full_text,
+    tweetId: data.statuses[i].id,
+    tweetDate: calculateSince(newTime)
+  }, (err, createdTweet)=>{
+    if(err){return err}
+    else{
+      console.log('success Normal Tweet' + i)
+    }
+  })}, 1000)
+}
+}
+})
+
+var stream = tweet.stream('statuses/filter', { track: ['gg delays']})
+
+stream.on('tweet', function(tweet){
+  console.log(tweet)
+  console.log(tweet.text)
+  Tweet.create({
+    tweetContent : tweet.text,
+    tweetId : tweet.id,
+    tweetDate: calculateSince(tweet.created_at)
+  }, (err, createdTweet)=>{
+    if(err){return err}
+    else{
+      console.log('success2')
+    }
+    // console.log(Tweet)
+  })
 })
 
 server.listen(port, () => {

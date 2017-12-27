@@ -92,5 +92,19 @@ $(document).ready(function(){
       }, 500)
   })
 
+//Twitter test bed
+// setInterval(function(){
+//   let x = document.querySelector('.tweettest')
+//   // location.reload()
+//   $('.tweettest').load(location.href)
+//   console.log("refreshed!")
+// }, 10000)
+
+// const tweet = require('./helpers/twitter')
+
+let twitterFeed = document.querySelector('.tweettest');
+
+twitterFeed.scrollIntoView(false);
+
 
 });
